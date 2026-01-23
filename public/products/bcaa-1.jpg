@@ -1,0 +1,6 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="400" fill="#fef3c7"/>
+  <text x="200" y="180" font-family="Arial" font-size="60" font-weight="bold" fill="#d97706" text-anchor="middle">⚡</text>
+  <text x="200" y="240" font-family="Arial" font-size="20" font-weight="bold" fill="#92400e" text-anchor="middle">BCAA 8:1:1</text>
+  <text x="200" y="265" font-family="Arial" font-size="14" fill="#b45309" text-anchor="middle">Acides Aminés</text>
+</svg>
