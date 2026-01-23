@@ -18,7 +18,9 @@ export default function ProduitsPage() {
         centered
         background="gray"
         className="py-12"
-      />
+      >
+        <div />
+      </Section>
 
       {/* Filtres */}
       <Section className="py-8 border-b border-neutral-200">

@@ -92,7 +92,9 @@ export default function FAQPage() {
         centered
         background="gray"
         className="py-12"
-      />
+      >
+        <div />
+      </Section>
 
       <Section>
         <div className="max-w-4xl mx-auto">

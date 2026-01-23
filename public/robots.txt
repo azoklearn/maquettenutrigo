@@ -1,0 +1,6 @@
+# robots.txt pour Nutrigo
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://nutrigo54.fr/sitemap.xml

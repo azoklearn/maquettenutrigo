@@ -12,7 +12,9 @@ export default function ContactPage() {
         centered
         background="gray"
         className="py-12"
-      />
+      >
+        <div />
+      </Section>
 
       <Section>
         <div className="grid lg:grid-cols-2 gap-12">
