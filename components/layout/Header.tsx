@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
 import { ShoppingCart, User, Menu, X, Search } from 'lucide-react'
+import { useCart } from '@/context/CartContext'
 
 const navigation = [
   { name: 'Accueil', href: '/' },
@@ -18,7 +19,7 @@ const navigation = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [cartCount] = useState(0) // À connecter avec le state global
+  const { cartCount } = useCart()
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-neutral-200">

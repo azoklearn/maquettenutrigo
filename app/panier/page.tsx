@@ -1,42 +1,28 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react'
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react'
 import Section from '@/components/ui/Section'
 import Button from '@/components/ui/Button'
 import { formatPrice } from '@/lib/utils'
-import { products } from '@/lib/data'
-
-// Exemple de panier (à remplacer par un state global)
-const cartItemsExample = [
-  { product: products[0], quantity: 2 },
-  { product: products[1], quantity: 1 },
-]
+import { useCart } from '@/context/CartContext'
 
 export default function PanierPage() {
-  const [cartItems, setCartItems] = useState(cartItemsExample)
+  const { 
+    cart, 
+    removeFromCart, 
+    updateQuantity, 
+    cartTotal, 
+    checkout, 
+    isLoading 
+  } = useCart()
 
-  const updateQuantity = (productId: string, delta: number) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.product.id === productId
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    )
-  }
-
-  const removeItem = (productId: string) => {
-    setCartItems(items => items.filter(item => item.product.id !== productId))
-  }
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+  const subtotal = cartTotal
   const shipping = subtotal >= 50 ? 0 : 4.99
   const total = subtotal + shipping
 
-  if (cartItems.length === 0) {
+  if (cart.length === 0) {
     return (
       <Section className="py-20">
         <div className="text-center max-w-md mx-auto">
@@ -72,17 +58,17 @@ export default function PanierPage() {
           {/* Articles */}
           <div className="lg:col-span-2">
             <div className="space-y-4">
-              {cartItems.map((item) => (
-                <div key={item.product.id} className="card p-4 lg:p-6">
+              {cart.map((item) => (
+                <div key={item.id} className="card p-4 lg:p-6">
                   <div className="flex gap-4">
                     {/* Image */}
                     <Link
-                      href={`/produits/${item.product.slug}`}
+                      href={`/produits/${item.handle}`}
                       className="relative w-24 h-24 flex-shrink-0 bg-neutral-100 rounded-lg overflow-hidden"
                     >
                       <Image
-                        src={item.product.images[0] || '/placeholder-product.jpg'}
-                        alt={item.product.name}
+                        src={item.image || '/placeholder.svg'}
+                        alt={item.name}
                         fill
                         className="object-cover"
                       />
@@ -90,20 +76,17 @@ export default function PanierPage() {
 
                     {/* Infos */}
                     <div className="flex-1 min-w-0">
-                      <Link href={`/produits/${item.product.slug}`}>
+                      <Link href={`/produits/${item.handle}`}>
                         <h3 className="font-semibold text-neutral-900 hover:text-primary-600 mb-1">
-                          {item.product.name}
+                          {item.name}
                         </h3>
                       </Link>
-                      <p className="text-sm text-neutral-600 mb-3">
-                        {item.product.brand}
-                      </p>
 
                       {/* Actions mobile */}
-                      <div className="flex items-center justify-between lg:hidden">
+                      <div className="flex items-center justify-between lg:hidden mt-3">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => updateQuantity(item.product.id, -1)}
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
                             className="w-8 h-8 flex items-center justify-center border border-neutral-300 rounded hover:bg-neutral-50"
                           >
                             <Minus className="w-4 h-4" />
@@ -112,7 +95,7 @@ export default function PanierPage() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.product.id, 1)}
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             className="w-8 h-8 flex items-center justify-center border border-neutral-300 rounded hover:bg-neutral-50"
                           >
                             <Plus className="w-4 h-4" />
@@ -120,7 +103,7 @@ export default function PanierPage() {
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-lg text-primary-600">
-                            {formatPrice(item.product.price * item.quantity)}
+                            {formatPrice(item.price * item.quantity)}
                           </p>
                         </div>
                       </div>
@@ -131,7 +114,7 @@ export default function PanierPage() {
                       {/* Quantité */}
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => updateQuantity(item.product.id, -1)}
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           className="w-8 h-8 flex items-center justify-center border border-neutral-300 rounded hover:bg-neutral-50"
                         >
                           <Minus className="w-4 h-4" />
@@ -140,7 +123,7 @@ export default function PanierPage() {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => updateQuantity(item.product.id, 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           className="w-8 h-8 flex items-center justify-center border border-neutral-300 rounded hover:bg-neutral-50"
                         >
                           <Plus className="w-4 h-4" />
@@ -150,16 +133,16 @@ export default function PanierPage() {
                       {/* Prix */}
                       <div className="w-32 text-right">
                         <p className="font-bold text-lg text-primary-600">
-                          {formatPrice(item.product.price * item.quantity)}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                         <p className="text-sm text-neutral-500">
-                          {formatPrice(item.product.price)} / unité
+                          {formatPrice(item.price)} / unité
                         </p>
                       </div>
 
                       {/* Supprimer */}
                       <button
-                        onClick={() => removeItem(item.product.id)}
+                        onClick={() => removeFromCart(item.id)}
                         className="p-2 text-neutral-400 hover:text-red-600 transition-colors"
                         aria-label="Supprimer"
                       >
@@ -170,7 +153,7 @@ export default function PanierPage() {
 
                   {/* Bouton supprimer mobile */}
                   <button
-                    onClick={() => removeItem(item.product.id)}
+                    onClick={() => removeFromCart(item.id)}
                     className="lg:hidden mt-3 text-sm text-red-600 hover:text-red-700 font-medium"
                   >
                     Supprimer
@@ -229,9 +212,25 @@ export default function PanierPage() {
                 </div>
               </div>
 
-              <Button variant="primary" size="lg" fullWidth className="mb-3">
-                Passer la commande
-                <ArrowRight className="w-5 h-5 ml-2 inline" />
+              <Button 
+                variant="primary" 
+                size="lg" 
+                fullWidth 
+                className="mb-3"
+                onClick={checkout}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 inline animate-spin" />
+                    Redirection...
+                  </>
+                ) : (
+                  <>
+                    Passer la commande
+                    <ArrowRight className="w-5 h-5 ml-2 inline" />
+                  </>
+                )}
               </Button>
 
               <Link href="/produits">

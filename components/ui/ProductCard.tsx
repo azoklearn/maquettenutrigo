@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingCart, Star } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { Product } from '@/lib/types'
 import { formatPrice } from '@/lib/utils'
-import Button from './Button'
+import AddToCartButton from './AddToCartButton'
 
 interface ProductCardProps {
   product: Product
@@ -100,20 +100,19 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Bouton */}
-          <Button
-            variant="primary"
-            size="md"
-            fullWidth
-            disabled={!inStock}
-            onClick={(e) => {
-              e.preventDefault()
-              // Logique d'ajout au panier
-              console.log('Ajout au panier:', product.id)
+          <AddToCartButton
+            product={{
+              id: product.id,
+              variantId: product.id,
+              name,
+              price,
+              image: images[0] || '/placeholder.svg',
+              handle: slug,
             }}
-          >
-            <ShoppingCart className="w-4 h-4 inline mr-2" />
-            Ajouter au panier
-          </Button>
+            disabled={!inStock}
+            fullWidth
+            size="md"
+          />
         </div>
       </Link>
     </div>
